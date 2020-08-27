@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from "react";
-import Grid from "@material-ui/core/Grid";
+
 import BingAutoSuggest from "../support/bing/modules/BingAutoSuggest";
 
 // Start Openlayers imports
@@ -44,23 +44,22 @@ import { getCoords } from "../support/utils";
 const map = new Map({
   //  Display the map in the div with the id of map
   layers: [
-    // new TileLayer({
-    //   source: new XYZSource({
-    //     crossOrigin: "null", // or "use-credentials", but not "none"
-    //     url: "//{a-c}.tile.openstreetmap.org/{z}/{x}/{y}.png",
-    //     projection: "EPSG:3857",
-    //   }),
-    // }),
     new TileLayer({
-      source: new BingMaps({
-        visible: false,
-        preload: Infinity,
-        crossOrigin: "use-credentials", // or "use-credentials", but not "none"
-        key: "AnwI1t4Sltp_gadZ9sPd3zxqWYOT39PoAmNwNjG2XSWH5096NMs_QAm5Rchogr5m",
+      source: new OSM({
+        crossOrigin: "anonymous", // or "use-credentials", but not "none"
         projection: "EPSG:3857",
-        imagerySet: "RoadOnDemand",
       }),
     }),
+    // new TileLayer({
+    //   source: new BingMaps({
+    //     visible: false,
+    //     preload: Infinity,
+    //     crossOrigin: "use-credentials", // or "use-credentials", but not "none"
+    //     key: "AnwI1t4Sltp_gadZ9sPd3zxqWYOT39PoAmNwNjG2XSWH5096NMs_QAm5Rchogr5m",
+    //     projection: "EPSG:3857",
+    //     imagerySet: "RoadOnDemand",
+    //   }),
+    // }),
   ],
   // Add in the following map controls
   controls: DefaultControls().extend([
@@ -133,13 +132,7 @@ const OLMapFragment = () => {
     backgroundColor: "#cccccc",
   };
 
-  return (
-    <Grid container>
-      <Grid item xs={12}>
-        <div id="map" style={style}></div>
-      </Grid>
-    </Grid>
-  );
+  return <div id="map" style={style}></div>;
 };
 
 export default OLMapFragment;

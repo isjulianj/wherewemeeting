@@ -17,10 +17,10 @@ class Bing {
       const head = document.getElementsByTagName("head")[0];
 
       // set the callback function to resolve promise once script tag appended
-      window.bingReady = () => {
+      (window as any).bingReady = () => {
         resolve();
 
-        delete window.bingReady;
+        delete (window as any).bingReady;
       };
 
       const bingUrl = `https://www.bing.com/api/maps/mapcontrol?key=AnwI1t4Sltp_gadZ9sPd3zxqWYOT39PoAmNwNjG2XSWH5096NMs_QAm5Rchogr5m&callback=bingReady`;
