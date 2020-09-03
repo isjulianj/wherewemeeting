@@ -1,66 +1,79 @@
 import React, { useState, useEffect } from "react";
 
-import BingAutoSuggest from "../support/bing/modules/BingAutoSuggest";
-
 // Start Openlayers imports
 import { Map, View } from "ol";
-import { GeoJSON, XYZ } from "ol/format";
+// import { GeoJSON, XYZ } from "ol/format";
 import OSM from "ol/source/OSM";
 import { Tile as TileLayer, Vector as VectorLayer } from "ol/layer";
 import {
   Vector as VectorSource,
-  OSM as OSMSource,
-  XYZ as XYZSource,
-  BingMaps,
-  TileWMS as TileWMSSource,
+  // OSM as OSMSource,
+  // XYZ as XYZSource,
+  // BingMaps,
+  // TileWMS as TileWMSSource,
 } from "ol/source";
 import {
-  Select as SelectInteraction,
-  defaults as DefaultInteractions,
-} from "ol/interaction";
+  Point
+} from 'ol/geom';
+import Feature from 'ol/Feature'
+// import {
+//   Select as SelectInteraction,
+//   defaults as DefaultInteractions,
+// } from "ol/interaction";
 import {
-  Attribution,
+  // Attribution,
   ScaleLine,
   ZoomSlider,
-  Zoom,
-  Rotate,
-  MousePosition,
+  // Zoom,
+  // Rotate,
+  // MousePosition,
   OverviewMap,
   defaults as DefaultControls,
 } from "ol/control";
 import {
   Style,
-  Fill as FillStyle,
-  RegularShape as RegularShapeStyle,
-  Stroke as StrokeStyle,
+  Icon,
+  // Fill as FillStyle,
+  // RegularShape as RegularShapeStyle,
+  // Stroke as StrokeStyle,
 } from "ol/style";
 
-import { Projection, get as getProjection, fromLonLat } from "ol/proj";
+// import { Projection, get as getProjection, fromLonLat } from "ol/proj";
+import { fromLonLat } from "ol/proj";
 
 import { getCoords } from "../support/utils";
 
 // End Openlayers imports
 
+
+const tileLayer = new TileLayer({
+  source: new OSM({
+    crossOrigin: "anonymous", // or "use-credentials", but not "none"
+    projection: "EPSG:3857",
+  }),
+});
+
+const vectorlayer = new VectorLayer({
+  className: 'locations',
+  source: new VectorSource({
+    features: []
+  }),
+  style: new Style({
+    image: new Icon({
+      anchor: [0.5, 46],
+      anchorXUnits: 'fraction',
+      anchorYUnits: 'pixels',
+      src: 'https://openlayers.org/en/latest/examples/data/icon.png'
+    })
+  })
+})
+
+let layers = [tileLayer, vectorlayer]
+
+
 const map = new Map({
   //  Display the map in the div with the id of map
-  layers: [
-    new TileLayer({
-      source: new OSM({
-        crossOrigin: "anonymous", // or "use-credentials", but not "none"
-        projection: "EPSG:3857",
-      }),
-    }),
-    // new TileLayer({
-    //   source: new BingMaps({
-    //     visible: false,
-    //     preload: Infinity,
-    //     crossOrigin: "use-credentials", // or "use-credentials", but not "none"
-    //     key: "AnwI1t4Sltp_gadZ9sPd3zxqWYOT39PoAmNwNjG2XSWH5096NMs_QAm5Rchogr5m",
-    //     projection: "EPSG:3857",
-    //     imagerySet: "RoadOnDemand",
-    //   }),
-    // }),
-  ],
+  layers,
   // Add in the following map controls
   controls: DefaultControls().extend([
     new ZoomSlider(),
@@ -76,18 +89,42 @@ const map = new Map({
   }),
 });
 
-const OLMapFragment = () => {
+const olSource = vectorlayer.getSource();
+
+const OLMapFragment = ({ meeting }) => {
+
+
+
+  useEffect(() => {
+    const pubSub = meeting.pubSub;
+    const sayHello = () => {
+      const locations = meeting.getLocations();
+
+      olSource.clear(true);
+      const iconFeatures = locations.map(location => {
+        return new Feature({
+          geometry: new Point(fromLonLat([location.attributes.coords[1], location.attributes.coords[0]])),
+          name: location.attributes.suggestion,
+        })
+      });
+
+      olSource.addFeatures(iconFeatures)
+      olSource.changed();
+    }
+    const newLocationToken = pubSub.subscribe('LOCATION_ADDED', sayHello)
+
+    return () => pubSub.unsubscribe(newLocationToken);
+  }, [meeting])
+
+
+
+
   const [coords, setCoords] = useState([0, 0]);
   const [height, setHeight] = useState(
     window.innerWidth >= 992 ? window.innerHeight : 400
   );
   const [mapZoom, setMapZoom] = useState(0);
 
-  useEffect(() => {
-    BingAutoSuggest.search("newbury").then((res) => {
-      console.log(res);
-    });
-  }, []);
 
   // get coords from the browser
   useEffect(() => {
@@ -103,20 +140,47 @@ const OLMapFragment = () => {
       .catch((err) => {
         console.log(err);
       });
+
+
+
   }, []);
+
+
+
 
   // add map
   useEffect(() => {
     map.setTarget("map");
     map.getView().setCenter(coords);
     map.getView().setZoom(mapZoom);
+
     return () => map.setTarget(undefined);
   }, [coords, mapZoom]);
+
+
+  // useEffect(() => {
+
+  //   const locations = meeting.getLocations();
+
+  //   olSource.clear(true);
+  //   const iconFeatures = locations.map(location => {
+  //     return new Feature({
+  //       geometry: new Point(fromLonLat([location.attributes.coords[1], location.attributes.coords[0]])),
+  //       name: location.attributes.suggestion,
+  //     })
+  //   });
+
+
+  //   olSource.addFeatures(iconFeatures)
+  //   olSource.changed();
+  //   console.log('changed')
+
+  // })
 
   // window resize
   useEffect(() => {
     const updateDimensions = () => {
-      const newHeight = window.innerWidth >= 992 ? window.innerHeight : 400;
+      const newHeight = window.innerWidth >= 768 ? window.innerHeight : '55vh';
       setHeight(newHeight);
     };
     window.addEventListener("resize", updateDimensions);
