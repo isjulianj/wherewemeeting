@@ -126,6 +126,23 @@ class Extent {
     }
 
 
+    /**
+     * Get min coords in array
+     * @returns {number[]}
+     */
+    getMinCoords(): number[] {
+        return [this.minX, this.minY];
+    }
+
+    /**
+     * Get max coords in array
+     * @returns {number[]}
+     */
+    getMaxCoords(): number[] {
+        return [this.maxX, this.maxY];
+    }
+
+
 }
 
 export default Extent
