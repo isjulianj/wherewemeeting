@@ -40,8 +40,9 @@ import {
 
 // import { Projection, get as getProjection, fromLonLat } from "ol/proj";
 import { fromLonLat } from "ol/proj";
-
 import { getCoords } from "../support/utils";
+
+import { groupFeatureExtent } from '../support/map/MapControl'
 
 // End Openlayers imports
 
@@ -91,27 +92,33 @@ const map = new Map({
 
 const olSource = vectorlayer.getSource();
 
+
+
 const OLMapFragment = ({ meeting }) => {
-
-
+  (window as any).olSource = olSource;
 
   useEffect(() => {
     const pubSub = meeting.pubSub;
-    const sayHello = () => {
+    const addFeatures = () => {
       const locations = meeting.getLocations();
 
       olSource.clear(true);
       const iconFeatures = locations.map(location => {
-        return new Feature({
+        const feature = new Feature({
           geometry: new Point(fromLonLat([location.attributes.coords[1], location.attributes.coords[0]])),
           name: location.attributes.suggestion,
-        })
+        });
+
+        feature.set('_LOCATION_DATA_', location, true);
+
+        return feature
       });
 
       olSource.addFeatures(iconFeatures)
       olSource.changed();
+      groupFeatureExtent(map, iconFeatures)
     }
-    const newLocationToken = pubSub.subscribe('LOCATION_ADDED', sayHello)
+    const newLocationToken = pubSub.subscribe('LOCATION_ADDED', addFeatures)
 
     return () => pubSub.unsubscribe(newLocationToken);
   }, [meeting])
