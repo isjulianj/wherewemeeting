@@ -11,3 +11,24 @@ code {
   font-family: source-code-pro, Menlo, Monaco, Consolas, 'Courier New',
     monospace;
 }
+
+
+.ol-zoom,
+.ol-zoomslider {
+  left: unset;
+  right: 8px;
+  display: none;
+}
+
+.ol-overviewmap {
+  display: none;
+}
+
+.MicrosoftMap {
+  flex: 0 0 100%;
+}
+
+.MicrosoftMap .as_container_search.as_container {
+  position: absolute;
+  width: auto;
+}

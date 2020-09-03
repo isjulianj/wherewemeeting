@@ -23,7 +23,7 @@ class Bing {
         delete (window as any).bingReady;
       };
 
-      const bingUrl = `https://www.bing.com/api/maps/mapcontrol?key=AnwI1t4Sltp_gadZ9sPd3zxqWYOT39PoAmNwNjG2XSWH5096NMs_QAm5Rchogr5m&callback=bingReady`;
+      const bingUrl = `https://www.bing.com/api/maps/mapcontrol?key=AkClI0BW6HSg2UWqXLQ2fxymgNtFHQ-7qY713jM2D50Jx7gzvGYFGcwACrPDDkss&callback=bingReady`;
 
       // create Script tag, set the url
       const bingScript = document.createElement("script");

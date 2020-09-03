@@ -7,6 +7,9 @@ let autoSuggestInitialised: Promise<any>;
 let Microsoft: any;
 
 export default class BingAutoSuggest {
+  /**
+   * Search loaction mannually
+   */
   static search(query, maxResults = 5) {
     return BingAutoSuggest.initialise().then(() => {
       Microsoft = (window as any).Microsoft;
@@ -19,6 +22,21 @@ export default class BingAutoSuggest {
       });
     });
   }
+
+  /**
+   * Attach a seatchbox to input
+   */
+  static attach(searchBox, searchBoxContainer, callBack) {
+    return BingAutoSuggest.initialise().then(() => {
+      Microsoft = (window as any).Microsoft;
+      return new Promise((resolve, reject) => {
+        let options = { maxResults: 5 };
+        const manager = new Microsoft.Maps.AutosuggestManager(options);
+        manager.attachAutosuggest(searchBox, searchBoxContainer, callBack);
+      });
+    });
+  }
+
   static initialise() {
     if (autoSuggestInitialised) {
       return autoSuggestInitialised;
