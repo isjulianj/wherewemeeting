@@ -1,4 +1,4 @@
-import React, { FunctionComponent } from "react";
+import React, { FunctionComponent, useState } from "react";
 import "./App.css";
 import OLMapFragment from "./components/OLMapFragment";
 import AddLocations from "./components/addLocationsPoints/AddLocations";
@@ -7,6 +7,8 @@ import TextInputWithAddRemoveButton from "./components/addLocationsPoints/TextIn
 import styles from "./styleModules/app.module.css";
 import MeetingHeader from "./support/MeetingHeader";
 import IlocationData from "./support/interfaces/ILocationData";
+import LocationLine from "./components/addLocationsPoints/LocationLine";
+import Extent from "./support/map/Extent";
 
 
 interface IAppState {
@@ -17,11 +19,10 @@ interface IAppState {
 }
 
 
-
+const meeting: MeetingHeader = new MeetingHeader();
 
 
 const App: FunctionComponent<IAppState> = () => {
-
   // const [appState, setAppState] = useState({
   //   lang: 'en',
   //   authenticated: true,
@@ -29,28 +30,40 @@ const App: FunctionComponent<IAppState> = () => {
   //   locations: []
 
   // });
-  const meeting: MeetingHeader = new MeetingHeader();
+
 
   // TODO: remove from live
   (window as any).meeting = meeting;
 
+  const [locationLength, setLocationLength] = useState(meeting.locations.length)
+  const [searchPanelOpen, setsearchPanelOpen] = useState({ open: false, location: null });
+
+
   const addLocation = (locationData: IlocationData) => {
     meeting.addLocation(locationData)
-    // setAppState(prevState => {
-    //   const locations = [...prevState.locations];
+    setLocationLength(meeting.locations.length);
 
-    //   locations.push(locationData)
-
-    //   return { ...prevState, locations }
-    // });
   };
+
+
+
+  const openSearchBox = (location: Location = null) => {
+    console.log(location)
+    setsearchPanelOpen(prevState => {
+      return { open: !prevState.open, location: location }
+    })
+  }
+
+
+
+
 
   return (
     <main className="App container-fluid">
       <div className={"row " + styles.wrapper}>
+        <TextInputWithAddRemoveButton addLocation={addLocation} searchPanelOpen={searchPanelOpen} />
         <div className={styles.wrapper__inputs}>
-          <AddLocations>
-            <TextInputWithAddRemoveButton addLocation={addLocation} />
+          <AddLocations meeting={meeting} openSearchBox={openSearchBox}>
           </AddLocations>
         </div>
         <div className={styles.wrapper__map}>

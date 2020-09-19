@@ -30,12 +30,11 @@ export const groupFeatureExtent = (map, featuresArray: Feature[]): void => {
 
 export const fitToExtent = (map, extent: Extent, transformCoordsTo3857: boolean) => {
 
-    console.log('hello')
+
     if (extent === undefined) {
         return
     }
     let olExtent: number[];
-    debugger;
     if (transformCoordsTo3857 === true) {
 
         // trnasform the data lat lon extent to the map coordinate system 3857

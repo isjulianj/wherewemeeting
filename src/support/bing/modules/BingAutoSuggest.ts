@@ -5,6 +5,7 @@ import Bing from "../Bing";
  */
 let autoSuggestInitialised: Promise<any>;
 let Microsoft: any;
+let manager: any;
 
 export default class BingAutoSuggest {
   /**
@@ -31,10 +32,14 @@ export default class BingAutoSuggest {
       Microsoft = (window as any).Microsoft;
       return new Promise((resolve, reject) => {
         let options = { maxResults: 5 };
-        const manager = new Microsoft.Maps.AutosuggestManager(options);
+        manager = new Microsoft.Maps.AutosuggestManager(options);
         manager.attachAutosuggest(searchBox, searchBoxContainer, callBack);
       });
     });
+  }
+
+  static detach() {
+    manager.detachAutosuggest();
   }
 
   static initialise() {

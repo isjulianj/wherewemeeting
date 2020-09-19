@@ -7,7 +7,6 @@ import Extent from "./map/Extent";
 
 class LocationAttributes {
 
-    meetingHeader: MeetingHeader
     bounds: Extent;
     coords: number[];
     suggestion: string;
