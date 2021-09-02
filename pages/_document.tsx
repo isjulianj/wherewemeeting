@@ -1,0 +1,1 @@
+export { Document as default } from "../libs/pages/Document";
