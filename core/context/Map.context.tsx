@@ -1,6 +1,7 @@
 import React, {createContext, ReactNode} from 'react';
 import {useState} from "react";
-import {Map} from "@tomtom-international/web-sdk-maps";
+// Start Openlayers imports
+import { Map } from "ol";
 
 interface MapContextValues {
     mapControl: Map;

@@ -46,6 +46,8 @@ class Document extends NextDocument {
                         rel="stylesheet"
                         href="https://fonts.googleapis.com/icon?family=Material+Icons|Material+Icons+Outlined"
                     />
+                    <link rel="stylesheet" href="https://cdn.jsdelivr.net/gh/openlayers/openlayers.github.io@master/en/v6.6.1/css/ol.css" type="text/css"/>
+
                     {/*<link*/}
                     {/*    rel="apple-touch-icon"*/}
                     {/*    sizes="180x180"*/}
