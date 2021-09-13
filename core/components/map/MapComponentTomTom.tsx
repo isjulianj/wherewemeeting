@@ -2,11 +2,11 @@ import React, {useEffect, useRef, useState} from 'react';
 import '@tomtom-international/web-sdk-maps/dist/maps.css'
 import tt from '@tomtom-international/web-sdk-maps';
 import {useMapContext} from "../../context/Map.context";
-import {getCoords} from "../../../libs/get-coords";
+import {getBrowserCoords} from "../../../lib/get-browser-coords";
 import {fromLonLat} from "ol/proj";
 
 
-const MapComponent = (props: any) => {
+const MapComponentTomTom = (props: any) => {
     const mapElement = useRef<HTMLDivElement | null>(null);
     const [browserCoords, setBrowserCoords] = useState<[number, number]>([-121.91599, 37.36765])
     const [mapZoom, setMapZoom] = useState(13);
@@ -14,7 +14,7 @@ const MapComponent = (props: any) => {
 
     // get coords from the browser
     useEffect(() => {
-        getCoords()
+        getBrowserCoords()
             .then((position) => {
                 console.log('hi trying to get details');
                 const convertedCoords = fromLonLat(
@@ -39,7 +39,8 @@ const MapComponent = (props: any) => {
             center: browserCoords,
             zoom: mapZoom
         });
-        setMapControl(map);
+        // where you need an adapter
+        // setMapControl(map);
 
         console.log(map)
         return () => map.remove();
@@ -51,4 +52,4 @@ const MapComponent = (props: any) => {
 
 }
 
-export default MapComponent
+export default MapComponentTomTom

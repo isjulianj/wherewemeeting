@@ -1,1 +1,1 @@
-export { Document as default } from "../libs/pages/Document";
+export { Document as default } from "../lib/pages/Document";

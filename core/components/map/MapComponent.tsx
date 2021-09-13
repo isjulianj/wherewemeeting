@@ -1,9 +1,9 @@
-import React, {useEffect, useRef, useState} from 'react';
+import React, {ReactNode, useEffect, useRef, useState} from 'react';
 import {useMapContext} from "../../context/Map.context";
-import {getCoords} from "../../../libs/get-coords";
+import {getBrowserCoords} from "../../../lib/get-browser-coords";
 
 // Start Openlayers imports
-import { Map, View } from "ol";
+import {Map, View} from "ol";
 import {fromLonLat} from "ol/proj";
 import VectorSource from "ol/source/Vector";
 import {Icon, Style} from "ol/style";
@@ -20,24 +20,30 @@ import {
     OverviewMap,
     defaults as DefaultControls,
 } from "ol/control";
+import {Marker} from "./Marker";
+import {useRecoilState} from "recoil";
+import {BrowserLocationState} from "../../atoms/BrowserLocationState";
 
 
-const MapComponent = (props: any) => {
+interface IMapComponentProps {
+    children: ReactNode
+}
+
+const MapComponent = ({children}: IMapComponentProps) => {
     const mapElement = useRef<HTMLDivElement | null>(null);
     const [coords, setCoords] = useState([0, 0]);
-    const [browserCoords, setBrowserCoords] = useState<number[]>([-121.91599, 37.36765])
+    const [browserCoords, setBrowserCoords] = useRecoilState(BrowserLocationState)
     const [mapZoom, setMapZoom] = useState(13);
-    const {setMapControl} = useMapContext();
+    const {mapControl, setMapControl} = useMapContext();
 
     const tileLayer = new TileLayer({
         source: new OSM({
             crossOrigin: "anonymous", // or "use-credentials", but not "none"
-            projection: "EPSG:3857",
         }),
     });
 
     const vectorlayer = new VectorLayer({
-        className: 'locations',
+        className: 'attendants',
         source: new VectorSource({
             features: []
         }),
@@ -56,25 +62,24 @@ const MapComponent = (props: any) => {
 
     // get coords from the browser
     useEffect(() => {
-        getCoords()
+        getBrowserCoords()
             .then((position) => {
-                console.log(position);
                 const convertedCoords = fromLonLat(
                     [position.coords.longitude, position.coords.latitude],
                     "EPSG:3857"
                 );
                 setMapZoom(15);
                 setBrowserCoords(convertedCoords);
+
             })
             .catch((err) => {
                 console.log(err);
             });
 
-
-
     }, []);
 
     useEffect(() => {
+
         const map = new Map({
             //  Display the map in the div with the id of map
             layers,
@@ -97,14 +102,24 @@ const MapComponent = (props: any) => {
         setMapControl(map);
 
         map.setTarget("map");
-        map.getView().setCenter(browserCoords);
-        map.getView().setZoom(mapZoom);
+
+
+        // (window.map as any) = map;
 
         return () => map.setTarget(undefined);
     }, []);
 
+    useEffect(() => {
+        if (!mapControl) return
+        mapControl.getView().setCenter(browserCoords);
+        mapControl.getView().setZoom(mapZoom);
+    }, [browserCoords])
+
     return (
-        <div ref={mapElement} className="mapDiv" id="map" style={{height: '100%'}}></div>
+        <div ref={mapElement} className="mapDiv" id="map" style={{height: '100%'}}>
+            <Marker></Marker>
+            {children}
+        </div>
     )
 
 }
