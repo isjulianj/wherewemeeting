@@ -17,11 +17,11 @@ export const getAttendantLocation = (attendant: Attendant) => {
     return attendant.location;
 }
 
-export const createAttendant = (name: string, location: Location): Attendant => {
+export const createAttendant = (id: number, name: string, location: Location): Attendant => {
     return {
-        id: 1,
+        id,
         name,
         isUser: false,
-        location: location,
+        location
     }
 }

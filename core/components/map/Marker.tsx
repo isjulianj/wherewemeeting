@@ -5,48 +5,64 @@ import {Point} from "ol/geom";
 import {Icon, Style} from "ol/style";
 import {convertESPG4326To3857} from "../../../lib/latLng-to-espg3857";
 import VectorLayer from "ol/layer/Vector";
+import {atom, useRecoilState} from "recoil";
+import {AttendantsState} from "../../atoms/AttendantsState";
+import {add} from 'ol/coordinate';
+import memoize from "@emotion/memoize";
+import {fitToExtent, groupOLFeatureExtent} from "../../adapters/vectorLayer/olVectorLayerApater";
 
-export const Marker = (): null => {
-    const {mapControl, attendants} = useMapContext()
+export const Marker = ({id}: any): null => {
+    const {mapControl, vectorLayer} = useMapContext()
+
+    const [attendants] = useRecoilState(AttendantsState)
 
 
-
-    useEffect(()=> {
+    useEffect(() => {
         if (!mapControl) return
+        const source = vectorLayer.getSource()
 
-        attendants.forEach(attendant => {
+        const iconStyle = new Style({
+            image: new Icon({
+                anchor: [0.5, 46],
+                anchorXUnits: 'fraction',
+                anchorYUnits: 'pixels',
+                //TODO: make some global variable options avail.. use image etc
+                src: '//openlayers.org/en/latest/examples/data/icon.png',
+            }),
+        });
 
-            const coords = convertESPG4326To3857({longitude: attendant.location.coords[0], latitude: attendant.location.coords[1]})
+
+        attendants.forEach((attendant, index) => {
+
+            const coords = convertESPG4326To3857({
+                longitude: attendant.location.coords[0],
+                latitude: attendant.location.coords[1]
+            })
 
             const iconFeature = new Feature({
                 geometry: new Point(coords),
-                name: 'Null Island',
-                population: 4000,
-                rainfall: 500,
-            });
-
-            const iconStyle = new Style({
-                image: new Icon({
-                    anchor: [0.5, 46],
-                    anchorXUnits: 'fraction',
-                    anchorYUnits: 'pixels',
-                    src: '//openlayers.org/en/latest/examples/data/icon.png',
-                }),
+                _LOCATION_DATA_: attendant,
             });
 
             iconFeature.setStyle(iconStyle);
 
-            mapControl.getLayers().getArray()[1].getSource().addFeature(iconFeature)
+            source.addFeature(iconFeature)
 
-            console.log(attendants)
+
         })
 
 
+        if (attendants.length > 1) {
+            const features = source.getFeatures();
+            const featureExtent = groupOLFeatureExtent(features)
 
-        return () => mapControl.getLayers().getArray()[1].getSource().clear()
+            fitToExtent(mapControl, featureExtent, true)
+        }
+
+
+        return () => vectorLayer.getSource().clear()
 
     }, [mapControl, attendants])
-
 
 
     return null

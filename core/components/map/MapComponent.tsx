@@ -23,6 +23,9 @@ import {
 import {Marker} from "./Marker";
 import {useRecoilState} from "recoil";
 import {BrowserLocationState} from "../../atoms/BrowserLocationState";
+import {OlMapState} from "../../atoms/OlMapState";
+import {OlVectorLayerState} from "../../atoms/OlVectorLayerState";
+import VectorImageLayer from "ol/layer/VectorImage";
 
 
 interface IMapComponentProps {
@@ -31,33 +34,12 @@ interface IMapComponentProps {
 
 const MapComponent = ({children}: IMapComponentProps) => {
     const mapElement = useRef<HTMLDivElement | null>(null);
-    const [coords, setCoords] = useState([0, 0]);
     const [browserCoords, setBrowserCoords] = useRecoilState(BrowserLocationState)
     const [mapZoom, setMapZoom] = useState(13);
-    const {mapControl, setMapControl} = useMapContext();
+    const {mapControl, setMapControl, vectorLayer, setVectorLayer} = useMapContext();
 
-    const tileLayer = new TileLayer({
-        source: new OSM({
-            crossOrigin: "anonymous", // or "use-credentials", but not "none"
-        }),
-    });
 
-    const vectorlayer = new VectorLayer({
-        className: 'attendants',
-        source: new VectorSource({
-            features: []
-        }),
-        style: new Style({
-            image: new Icon({
-                anchor: [0.5, 46],
-                anchorXUnits: 'fraction',
-                anchorYUnits: 'pixels',
-                src: 'https://openlayers.org/en/latest/examples/data/icon.png'
-            })
-        })
-    })
-
-    const layers = [tileLayer, vectorlayer]
+    const [olMap, setOlMap] = useRecoilState(OlMapState);
 
 
     // get coords from the browser
@@ -78,37 +60,60 @@ const MapComponent = ({children}: IMapComponentProps) => {
 
     }, []);
 
+    // Map, tile and feature layer set up
     useEffect(() => {
 
-        const map = new Map({
-            //  Display the map in the div with the id of map
-            layers,
-            // Add in the following map controls
-            controls: DefaultControls().extend([
-                new ZoomSlider(),
-                // new MousePosition(),
-                new ScaleLine(),
-                new OverviewMap(),
-            ]),
+            const olVectorLayer = new VectorImageLayer({
+                className: 'attendants',
+                source: new VectorSource({
+                    features: []
+                }),
+                style: new Style({
+                    image: new Icon({
+                        anchor: [0.5, 46],
+                        anchorXUnits: 'fraction',
+                        anchorYUnits: 'pixels',
+                        src: 'https://openlayers.org/en/latest/examples/data/icon.png'
+                    })
+                })
+            })
 
-            // Render the tile layers in a map view with a Mercator projection
-            view: new View({
-                projection: "EPSG:3857",
-                zoom: 2,
-            }),
-            target: mapElement.current,
-        });
+            const newOlmap = new Map({
+                //  Display the map in the div with the id of map
+                layers: [new TileLayer({
+                    source: new OSM({
+                        crossOrigin: "anonymous", // or "use-credentials", but not "none"
+                    })
+                }),
+                    olVectorLayer
+                ],
+                // Add in the following map controls
+                controls: DefaultControls().extend([
+                    new ZoomSlider(),
+                    // new MousePosition(),
+                    new ScaleLine(),
+                    new OverviewMap(),
+                ]),
 
-        setMapControl(map);
+                // Render the tile layers in a map view with a Mercator projection
+                view: new View({
+                    projection: "EPSG:3857",
+                    zoom: 2,
+                }),
+                target: mapElement.current,
+            });
 
-        map.setTarget("map");
+            setMapControl(newOlmap);
+            setVectorLayer(olVectorLayer)
 
 
-        // (window.map as any) = map;
+            return () => newOlmap.setTarget(undefined);
+        },
+        []
+    )
+    ;
 
-        return () => map.setTarget(undefined);
-    }, []);
-
+    // update map zoom from browser control
     useEffect(() => {
         if (!mapControl) return
         mapControl.getView().setCenter(browserCoords);

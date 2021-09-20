@@ -1,4 +1,4 @@
-import React, {ReactElement, useEffect, useRef} from 'react';
+import React, {ReactElement, ReactNode, useEffect, useRef, useState} from 'react';
 import {Box, Button, Typography} from "@material-ui/core";
 import {useMapContext} from "../context/Map.context";
 import {convertESPG4326To3857} from "../../lib/latLng-to-espg3857";
@@ -9,14 +9,33 @@ import {createLocation} from "../domain/location";
 import {Extent} from "../models/Extent";
 import {Attendant, createAttendant} from "../domain/attendant";
 import {AttendantsContainer} from "./AttendantsContainer";
+import {useRecoilCallback, useRecoilState, useRecoilValue, useSetRecoilState} from "recoil";
+import {AttendantsState, AttendantState} from "../atoms/AttendantsState";
 
+interface SearchItemProps {
+    children?: ReactNode;
+}
 
-const SetLocation = () => {
+const SetLocation = ({children}: SearchItemProps) => {
 
     const searchContainer = useRef<HTMLDivElement | null>(null);
 
     const API_KEY = 'enDW8HX6mL8UjAOeXWskWdiBlaAK3Fwa';
-    const {mapControl, attendants, setAttendants} = useMapContext();
+    const {mapControl} = useMapContext();
+    const attendants = useRecoilValue(AttendantsState)
+
+    const insertAttendant = useRecoilCallback(
+        ({set}) => (attendant: Attendant) => {
+            set(AttendantsState, (e) => [...e, attendant])
+
+
+            set(AttendantState(attendant.id), {
+                ...attendant
+            })
+
+        },
+        [attendants.length],
+    )
 
     const ttServices = tt.services;
 
@@ -54,29 +73,30 @@ const SetLocation = () => {
         return () => ttSearchBox.onRemove();
     }, [mapControl])
 
+    function getRandomInt(max) {
+        return Math.floor(Math.random() * max);
+    }
 
-    const setLocation = (event: SearchBoxEvent): void => {
+    const setLocation = (event: SearchBoxEvent): any => {
         const result = event?.data?.result;
 
-        console.log(result)
 
         //minLon, minLat, maxLon, maxLat.
         const extent = new Extent(
-            result.boundingBox.btmRightPoint.lng,
             result.boundingBox.btmRightPoint.lat,
+            result.boundingBox.btmRightPoint.lng,
+            result.boundingBox.topLeftPoint.lat,
             result.boundingBox.topLeftPoint.lng,
         )
 
         const newLocation = createLocation(extent, [result.position.lng, result.position.lat], result.address.municipality)
 
-        const newAttendant = createAttendant('Jules', newLocation);
+
+        const newAtt = createAttendant((getRandomInt(1000000)), 'Jules', newLocation);
 
 
-        setAttendants((oldAttendants: Attendant[]) => {
-            return [...oldAttendants, newAttendant];
-        })
-
-
+        insertAttendant(newAtt)
+        
         mapControl.getView().setCenter(convertESPG4326To3857({
             longitude: result.position.lng,
             latitude: result.position.lat
@@ -89,8 +109,7 @@ const SetLocation = () => {
             <Typography variant='h5' component="h5">Add a Person's location</Typography>
             <div className="search-container">
                 <div ref={searchContainer} style={{marginBottom: '1rem'}}></div>
-                {attendants && <AttendantsContainer attendants={attendants}/>}
-
+                {attendants.map((attendant: Attendant) => <AttendantsContainer key={attendant.id} attendantId={attendant.id}/>)}
             </div>
         </Box>
     )

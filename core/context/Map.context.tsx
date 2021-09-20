@@ -1,4 +1,4 @@
-import React, {createContext, ReactNode,useState, useEffect} from 'react';
+import React, {createContext, ReactNode, useState, useEffect} from 'react';
 
 // Start Openlayers imports
 import {Map, PluggableMap} from "ol";
@@ -8,14 +8,16 @@ import {createUser, User} from "../domain/user";
 import {Attendant} from "../domain/attendant";
 import {createLocation, Location} from "../domain/location";
 import {Extent} from "../models/Extent";
+import VectorLayer from "ol/layer/Vector";
+
 
 interface MapContextValues {
     mapControl: PluggableMap;
     setMapControl: (map: Map) => void;
     meeting?: Meeting;
     setMeeting?: (meeting: Meeting) => void;
-    attendants?: Attendant[];
-    setAttendants?: (attendants: (oldAttendants: Attendant[]) => (Attendant | Attendant)[]) => void;
+    vectorLayer: any;
+    setVectorLayer: (olVectorlayer: VectorLayer<import("../source/Vector.js").default<any>>) => void;
 }
 
 interface IMapProvider {
@@ -23,13 +25,13 @@ interface IMapProvider {
     children?: ReactNode
 }
 
-const MapContext = createContext<MapContextValues>({mapControl: null, setMapControl: null});
+const MapContext = createContext<MapContextValues>({mapControl: null, setMapControl: null, vectorLayer: null, setVectorLayer: null});
 
 export const MapProvider = ({map = null, children}: IMapProvider) => {
 
     const [meeting, setMeeting] = useState<Meeting>(null);
     const [mapControl, setMapControl] = useState<Map>(null);
-    const [attendants, setAttendants] = useState<Attendant[]>([]   );
+    const [vectorLayer, setVectorLayer] = useState<any>(null)
 
     // initial meeting
 
@@ -52,8 +54,7 @@ export const MapProvider = ({map = null, children}: IMapProvider) => {
         setMapControl,
         meeting,
         setMeeting,
-        attendants,
-        setAttendants
+        vectorLayer, setVectorLayer
     }
 
 
