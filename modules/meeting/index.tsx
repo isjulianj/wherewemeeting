@@ -10,8 +10,8 @@ export const  Meeting = ({children}: IMeetingProps) => {
 
 
     return (
-       <>
-           {children}
-       </>
+        <>
+            {children}
+        </>
     );
 }

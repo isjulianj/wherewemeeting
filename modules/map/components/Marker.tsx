@@ -1,25 +1,25 @@
 import React, {useContext, useEffect} from 'react';
-import {useMapContext} from "../../context/Map.context";
+
 import {Feature} from "ol";
 import {Point} from "ol/geom";
 import {Icon, Style} from "ol/style";
+import { useRecoilState} from "recoil";
+import {AttendantsState} from "../../../core/state/AttendantsState";
+import {useMapContext} from "../../../context/Map.context";
 import {convertESPG4326To3857} from "../../../lib/latLng-to-espg3857";
-import VectorLayer from "ol/layer/Vector";
-import {atom, useRecoilState} from "recoil";
-import {AttendantsState} from "../../atoms/AttendantsState";
-import {add} from 'ol/coordinate';
-import memoize from "@emotion/memoize";
-import {fitToExtent, groupOLFeatureExtent} from "../../adapters/vectorLayer/olVectorLayerApater";
+import {fitToExtent, groupOLFeatureExtent} from "../adapters/vectorLayer/olVectorLayerApater";
 
 export const Marker = ({id}: any): null => {
-    const {mapControl, vectorLayer} = useMapContext()
+    const {mapControl, vectorImageLayer} = useMapContext()
 
     const [attendants] = useRecoilState(AttendantsState)
 
 
     useEffect(() => {
         if (!mapControl) return
-        const source = vectorLayer.getSource()
+        if (!attendants) return
+
+        const source = vectorImageLayer.getSource()
 
         const iconStyle = new Style({
             image: new Icon({
@@ -52,7 +52,7 @@ export const Marker = ({id}: any): null => {
         })
 
 
-        if (attendants.length > 1) {
+        if (attendants.length> 0    ) {
             const features = source.getFeatures();
             const featureExtent = groupOLFeatureExtent(features)
 
@@ -60,7 +60,7 @@ export const Marker = ({id}: any): null => {
         }
 
 
-        return () => vectorLayer.getSource().clear()
+        return () => vectorImageLayer.getSource().clear()
 
     }, [mapControl, attendants])
 

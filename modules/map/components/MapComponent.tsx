@@ -1,15 +1,14 @@
 import React, {ReactNode, useEffect, useRef, useState} from 'react';
-import {useMapContext} from "../../context/Map.context";
+import {useMapContext} from "../../../context/Map.context";
 import {getBrowserCoords} from "../../../lib/get-browser-coords";
 
 // Start Openlayers imports
-import {Map, View} from "ol";
+import {Feature, Map, View} from "ol";
 import {fromLonLat} from "ol/proj";
 import VectorSource from "ol/source/Vector";
 import {Icon, Style} from "ol/style";
 import TileLayer from "ol/layer/Tile";
 import {OSM} from "ol/source";
-import VectorLayer from "ol/layer/Vector";
 import {
     // Attribution,
     ScaleLine,
@@ -22,24 +21,17 @@ import {
 } from "ol/control";
 import {Marker} from "./Marker";
 import {useRecoilState} from "recoil";
-import {BrowserLocationState} from "../../atoms/BrowserLocationState";
-import {OlMapState} from "../../atoms/OlMapState";
-import {OlVectorLayerState} from "../../atoms/OlVectorLayerState";
+import {BrowserLocationState} from "../../../core/state/BrowserLocationState";
 import VectorImageLayer from "ol/layer/VectorImage";
+import {getCenter} from 'ol/extent';
 
 
-interface IMapComponentProps {
-    children: ReactNode
-}
-
-const MapComponent = ({children}: IMapComponentProps) => {
+const MapComponent = () => {
     const mapElement = useRef<HTMLDivElement | null>(null);
     const [browserCoords, setBrowserCoords] = useRecoilState(BrowserLocationState)
     const [mapZoom, setMapZoom] = useState(13);
-    const {mapControl, setMapControl, vectorLayer, setVectorLayer} = useMapContext();
+    const {mapControl, setMapControl, vectorImageLayer, setVectorImageLayer} = useMapContext();
 
-
-    const [olMap, setOlMap] = useRecoilState(OlMapState);
 
 
     // get coords from the browser
@@ -104,7 +96,7 @@ const MapComponent = ({children}: IMapComponentProps) => {
             });
 
             setMapControl(newOlmap);
-            setVectorLayer(olVectorLayer)
+            setVectorImageLayer(olVectorLayer)
 
 
             return () => newOlmap.setTarget(undefined);
@@ -116,14 +108,21 @@ const MapComponent = ({children}: IMapComponentProps) => {
     // update map zoom from browser control
     useEffect(() => {
         if (!mapControl) return
-        mapControl.getView().setCenter(browserCoords);
-        mapControl.getView().setZoom(mapZoom);
+
+        if (!vectorImageLayer) return
+
+        //TODO: if no stored datathen zoom to browser coords
+        const featuresExtent = vectorImageLayer?.getSource()?.getExtent();
+        const centered = getCenter(featuresExtent) || browserCoords
+
+
+        mapControl.getView().setCenter(centered);
+        mapControl.getView().setZoom(5);
     }, [browserCoords])
 
     return (
         <div ref={mapElement} className="mapDiv" id="map" style={{height: '100%'}}>
             <Marker></Marker>
-            {children}
         </div>
     )
 

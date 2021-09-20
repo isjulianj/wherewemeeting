@@ -1,4 +1,4 @@
-import {Extent} from "../models/Extent";
+import {Extent} from "../../../core/models/Extent";
 
 export type Location = {
     bounds: Extent;

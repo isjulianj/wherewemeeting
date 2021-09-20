@@ -1,6 +1,6 @@
-import {Attendant} from "./attendant";
+import {Attendant} from "../../attendants/domain/attendant";
 import {User} from "./user";
-import {Location} from "./location";
+import {Location} from "../../attendants/domain/location";
 
 
 export type MeetingStatus = "new" | "planning" | "complete"

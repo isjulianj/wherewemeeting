@@ -2,13 +2,11 @@ import React, {createContext, ReactNode, useState, useEffect} from 'react';
 
 // Start Openlayers imports
 import {Map, PluggableMap} from "ol";
-import {Attendants} from "../domain/attendants";
-import {Meeting, MeetingStatus} from "../domain/meeting";
-import {createUser, User} from "../domain/user";
-import {Attendant} from "../domain/attendant";
-import {createLocation, Location} from "../domain/location";
-import {Extent} from "../models/Extent";
-import VectorLayer from "ol/layer/Vector";
+import {Meeting, MeetingStatus} from "../modules/meeting/domain/meeting";
+import {createUser, User} from "../modules/meeting/domain/user";
+import {createLocation, Location} from "../modules/attendants/domain/location";
+import {Extent} from "../core/models/Extent";
+import VectorImageLayer from "ol/layer/VectorImage";
 
 
 interface MapContextValues {
@@ -16,8 +14,8 @@ interface MapContextValues {
     setMapControl: (map: Map) => void;
     meeting?: Meeting;
     setMeeting?: (meeting: Meeting) => void;
-    vectorLayer: any;
-    setVectorLayer: (olVectorlayer: VectorLayer<import("../source/Vector.js").default<any>>) => void;
+    vectorImageLayer: VectorImageLayer<any>;
+    setVectorImageLayer: (olVectorImageLayer: VectorImageLayer<any>) => void;
 }
 
 interface IMapProvider {
@@ -25,13 +23,13 @@ interface IMapProvider {
     children?: ReactNode
 }
 
-const MapContext = createContext<MapContextValues>({mapControl: null, setMapControl: null, vectorLayer: null, setVectorLayer: null});
+const MapContext = createContext<MapContextValues>({mapControl: null, setMapControl: null, vectorImageLayer: null, setVectorImageLayer: null});
 
 export const MapProvider = ({map = null, children}: IMapProvider) => {
 
     const [meeting, setMeeting] = useState<Meeting>(null);
     const [mapControl, setMapControl] = useState<Map>(null);
-    const [vectorLayer, setVectorLayer] = useState<any>(null)
+    const [vectorImageLayer, setVectorImageLayer] = useState<any>(null)
 
     // initial meeting
 
@@ -54,7 +52,8 @@ export const MapProvider = ({map = null, children}: IMapProvider) => {
         setMapControl,
         meeting,
         setMeeting,
-        vectorLayer, setVectorLayer
+        vectorImageLayer: vectorImageLayer,
+        setVectorImageLayer: setVectorImageLayer
     }
 
 

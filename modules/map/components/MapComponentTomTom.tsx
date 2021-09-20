@@ -1,7 +1,7 @@
 import React, {useEffect, useRef, useState} from 'react';
 import '@tomtom-international/web-sdk-maps/dist/maps.css'
 import tt from '@tomtom-international/web-sdk-maps';
-import {useMapContext} from "../../context/Map.context";
+import {useMapContext} from "../../../context/Map.context";
 import {getBrowserCoords} from "../../../lib/get-browser-coords";
 import {fromLonLat} from "ol/proj";
 
@@ -16,7 +16,6 @@ const MapComponentTomTom = (props: any) => {
     useEffect(() => {
         getBrowserCoords()
             .then((position) => {
-                console.log('hi trying to get details');
                 const convertedCoords = fromLonLat(
                     [position.coords.longitude, position.coords.latitude],
                     "EPSG:3857"
@@ -42,7 +41,6 @@ const MapComponentTomTom = (props: any) => {
         // where you need an adapter
         // setMapControl(map);
 
-        console.log(map)
         return () => map.remove();
     }, []);
 
