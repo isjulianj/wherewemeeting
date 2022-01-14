@@ -1,9 +1,10 @@
-import {Extent} from "../../../core/models/Extent";
+import {Extent} from "../core/models/Extent";
 
 export type Location = {
     bounds: Extent;
     coords: number[];
     locationName: LocationName;
+    imageUrl?: string;
 }
 
 /**

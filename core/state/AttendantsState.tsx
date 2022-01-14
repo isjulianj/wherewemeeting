@@ -1,9 +1,7 @@
-import {atom, AtomEffect, atomFamily, DefaultValue, selector} from "recoil";
-import {Attendant, createAttendant} from "../../modules/attendants/domain/attendant";
-import {User} from "../../modules/meeting/domain/user";
-import {createLocation, Location} from "../../modules/attendants/domain/location";
+import {atom, atomFamily} from "recoil";
+import {Attendant, createAttendant} from "../../domain/attendant";
+import {createLocation} from "../../domain/location";
 import {Extent} from "../models/Extent";
-import {OlExtent} from "../models/OlExtent";
 
 
 const DefaultAtom: Attendant = {
@@ -48,8 +46,7 @@ export const AttendantsState = atom<Attendant[]>({
             const newData = data.map((storedAttendant: any) => {
                 const bounds = new Extent(storedAttendant.location.bounds)
                 const location = createLocation(bounds, storedAttendant.location.coords, storedAttendant.location.locationName);
-                const attendant = createAttendant(storedAttendant.id, storedAttendant.name, location)
-                return attendant
+                return createAttendant(storedAttendant.id, storedAttendant.name, location)
             });
             setSelf(newData)
         }

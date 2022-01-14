@@ -2,9 +2,9 @@ import React, {createContext, ReactNode, useState, useEffect} from 'react';
 
 // Start Openlayers imports
 import {Map, PluggableMap} from "ol";
-import {Meeting, MeetingStatus} from "../modules/meeting/domain/meeting";
-import {createUser, User} from "../modules/meeting/domain/user";
-import {createLocation, Location} from "../modules/attendants/domain/location";
+import {Meeting} from "../domain/meeting";
+import {createUser} from "../domain/user";
+import {createLocation} from "../domain/location";
 import {Extent} from "../core/models/Extent";
 import VectorImageLayer from "ol/layer/VectorImage";
 

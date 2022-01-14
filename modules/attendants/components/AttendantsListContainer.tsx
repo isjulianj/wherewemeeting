@@ -1,17 +1,13 @@
 import React, {ReactNode} from 'react';
 import {
-    useGetRecoilValueInfo_UNSTABLE,
     useRecoilCallback,
-    useRecoilState,
     useRecoilValue,
-    useResetRecoilState,
-    useSetRecoilState
 } from "recoil";
 import {AttendantsState, AttendantState} from "../../../core/state/AttendantsState";
-import {Box, Button, CardContent, Typography} from "@material-ui/core";
-import Card from "@material-ui/core/Card";
-import {Attendant} from "../domain/attendant";
+import {Box, Button, CardActionArea, CardContent, CardMedia, Typography, Card} from "@mui/material";
+import {Attendant} from "../../../domain/attendant";
 import {useMapContext} from "../../../context/Map.context";
+
 
 
 interface IAttendantListItemProps {
@@ -21,14 +17,14 @@ interface IAttendantListItemProps {
 export const AttendantListItem = ({attendantItem}: IAttendantListItemProps) => {
 
 
-    const attendant= useRecoilValue(AttendantState(attendantItem.id))
+    const attendant = useRecoilValue(AttendantState(attendantItem.id))
 
     const attendants = useRecoilValue(AttendantsState)
 
     // TODO: best way to remove state?
     const removeAttendant = useRecoilCallback(
         ({set, reset}) => (attendant: Attendant) => {
-            set(AttendantsState, (e) => {
+            set(AttendantsState, (array) => {
                     const updatedAttendants = attendants.filter(item => item.id !== attendant.id);
                     return [...updatedAttendants]
                 }
@@ -54,25 +50,26 @@ export const AttendantListItem = ({attendantItem}: IAttendantListItemProps) => {
     return (
         <>
             {attendant.id !== null && (
-                <Box marginBottom={2}>
-                    <Card>
-                        <div>
+                <Box marginBottom={2} marginRight={2}>
+                    <Card sx={{maxWidth: 345}}>
+                        <CardActionArea>
+                            <CardMedia
+                                component="img"
+                                height="140"
+                                image="https://media.istockphoto.com/photos/eiffel-tower-aerial-view-paris-picture-id1145422105?s=612x612"
+                                alt="green iguana"
+                            />
                             <CardContent>
-                                <Typography component="h5" variant="h5">
-                                    {attendantItem.name}
-                                </Typography>
-                                <Typography variant="subtitle1" color="textSecondary">
+                                <Typography variant="subtitle1" color="text.secondary" component="div">
                                     {attendantItem.location.locationName}
                                 </Typography>
-                                <Typography variant="subtitle1" color="textSecondary">
-                                    {attendantItem.id}
+                                <Typography gutterBottom variant="h5" component="div">
+                                    {attendantItem.name}
                                 </Typography>
+
+
                             </CardContent>
-                        </div>
-                        {/*<CardMedia*/}
-                        {/*    image="/static/images/cards/live-from-space.jpg"*/}
-                        {/*    title="Live from space album cover"*/}
-                        {/*/>*/}
+                        </CardActionArea>
                     </Card>
                     <Button onClick={() => removeAttendant(attendant)}>remove</Button>
                 </Box>

@@ -1,9 +1,9 @@
 import {Feature, Map} from "ol";
 import {fromLonLat} from "ol/proj";
 import {buffer, Extent as olExtent} from 'ol/extent';
-import {Attendant} from "../../../attendants/domain/attendant";
+import {Attendant} from "../../../../domain/attendant";
 import {OlExtent} from "../../../../core/models/OlExtent";
-import {ExtentArray, ExtentInterface} from "../../../../core/models/ExtentInterface";
+
 
 
 export const groupOLFeatureExtent = (featuresArray: Feature<any>[], locationDataPropertyName: string = '_LOCATION_DATA_'): OlExtent => {

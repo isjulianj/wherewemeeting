@@ -1,4 +1,4 @@
-import {User} from "../../meeting/domain/user";
+import {User} from "./user";
 import {Location} from "./location";
 
 export type Attendant = {

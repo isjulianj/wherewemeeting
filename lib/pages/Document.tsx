@@ -6,8 +6,9 @@ import NextDocument, {
     Main,
     NextScript,
 } from 'next/document';
+import {ServerStyleSheets} from "@mui/styles";
 // import { getEnvironmentVariable } from '@dc3/utils/constants';
-import { ServerStyleSheets } from '@material-ui/core/styles';
+
 
 
 // const getFavicon = (icon: string) => `${mediaServer}/favicon/${icon}`;
@@ -37,7 +38,7 @@ class Document extends NextDocument {
     render() {
         return (
             <Html>
-                <Head>
+                <Head >
                     <link
                         href="https://fonts.googleapis.com/css?family=Roboto:100,300,400,500,700,900&display=swap"
                         rel="stylesheet"
@@ -47,6 +48,7 @@ class Document extends NextDocument {
                         href="https://fonts.googleapis.com/icon?family=Material+Icons|Material+Icons+Outlined"
                     />
                     <link rel="stylesheet" href="https://cdn.jsdelivr.net/gh/openlayers/openlayers.github.io@master/en/v6.6.1/css/ol.css" type="text/css"/>
+                    <title>Where we meeting?</title>
 
                     {/*<link*/}
                     {/*    rel="apple-touch-icon"*/}
