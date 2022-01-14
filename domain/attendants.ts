@@ -5,7 +5,7 @@ export type Attendants = Attendant[];
 
 /**
  * Add an attendant
- * @param attendants
+ * @param currentAttendants
  * @param newAttendant
  */
 export function addAttendant(currentAttendants: Attendants, newAttendant: Attendant): Attendant[] {
